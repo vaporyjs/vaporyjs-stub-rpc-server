@@ -85,11 +85,11 @@ function testProtocol(transportType, address) {
   it("adds sent transaction to block when mined", () => {
     let inputTransaction = { from: "0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef" };
     var transactionHash;
-    return submitJsonRpc("eth_sendTransaction", [inputTransaction]).then((responseJso) => {
+    return submitJsonRpc("vap_sendTransaction", [inputTransaction]).then((responseJso) => {
       transactionHash = responseJso.result;
       assert.match(transactionHash, /^0x[0-9a-zA-Z]{64}$/);
       server.mine();
-      return submitJsonRpc("eth_getTransactionByHash", [transactionHash]);
+      return submitJsonRpc("vap_getTransactionByHash", [transactionHash]);
     }).then((responseJso) => {
       let transaction = responseJso.result;
       assert.match(transaction.blockHash, /^0x[0-9a-zA-Z]{64}$/);

@@ -34,7 +34,7 @@ function IpcServer(ipcPath) {
   }.bind(this));
   this.underlyingServer.listen(ipcPath);
 
-  this.addResponder(ethSubscribeResponder.bind(this));
+  this.addResponder(vapSubscribeResponder.bind(this));
 }
 
 IpcServer.prototype = Object.create(AbstractServer.prototype);
@@ -56,9 +56,9 @@ IpcServer.prototype.destroy = function (callback) {
 module.exports = IpcServer;
 
 /**
- * This responder responds to `eth_subscribe` method calls with a null subscription ID
+ * This responder responds to `vap_subscribe` method calls with a null subscription ID
  */
-function ethSubscribeResponder(request) {
-  if (request.method !== "eth_subscribe") return undefined;
+function vapSubscribeResponder(request) {
+  if (request.method !== "vap_subscribe") return undefined;
   return "0x00000000000000000000000000000000";
 }

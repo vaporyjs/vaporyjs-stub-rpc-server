@@ -17,13 +17,13 @@ function AbstractServer() {
   });
 
   this.clearResponders();
-  this.addResponder(ethGetLogsResponder.bind(this));
-  this.addResponder(ethBlockNumberResponder.bind(this));
-  this.addResponder(ethCallResponder.bind(this));
-  this.addResponder(ethGetBlockByHashResponder.bind(this));
-  this.addResponder(ethGetBlockByNumberResponder.bind(this));
-  this.addResponder(ethGetTransactionByHashResponder.bind(this));
-  this.addResponder(ethSendTransactionResponder.bind(this));
+  this.addResponder(vapGetLogsResponder.bind(this));
+  this.addResponder(vapBlockNumberResponder.bind(this));
+  this.addResponder(vapCallResponder.bind(this));
+  this.addResponder(vapGetBlockByHashResponder.bind(this));
+  this.addResponder(vapGetBlockByNumberResponder.bind(this));
+  this.addResponder(vapGetTransactionByHashResponder.bind(this));
+  this.addResponder(vapSendTransactionResponder.bind(this));
   this.addResponder(netVersionResponder.bind(this));
 }
 
@@ -79,7 +79,7 @@ AbstractServer.prototype.mine = function () {
     newBlock.transactions.push(transaction);
   }
   this.blocks.push(newBlock);
-  var jso = { jsonrpc: "2.0", method: "eth_subscription", params: { subscription: "0x00000000000000000000000000000000", result: newBlock } };
+  var jso = { jsonrpc: "2.0", method: "vap_subscription", params: { subscription: "0x00000000000000000000000000000000", result: newBlock } };
   this.makeRequest(jso);
 }
 
@@ -164,11 +164,11 @@ function netVersionResponder(request) {
 }
 
 /**
- * This responder responds to `eth_getBlockByNumber` method calls with a reasonably shaped block
+ * This responder responds to `vap_getBlockByNumber` method calls with a reasonably shaped block
  */
-function ethGetBlockByNumberResponder(request) {
-  if (request.method !== "eth_getBlockByNumber") return undefined;
-  if (!request.params || !request.params[0] || typeof request.params[0] !== "string") return new Error("eth_getBlockByNumber requires a block number (string) as the first parameter.");
+function vapGetBlockByNumberResponder(request) {
+  if (request.method !== "vap_getBlockByNumber") return undefined;
+  if (!request.params || !request.params[0] || typeof request.params[0] !== "string") return new Error("vap_getBlockByNumber requires a block number (string) as the first parameter.");
   var blockNumber;
   if (request.params[0] === "latest") blockNumber = this.blocks.length - 1;
   else if (request.params[0] === "earliest") blockNumber = 0;
@@ -179,13 +179,13 @@ function ethGetBlockByNumberResponder(request) {
 }
 
 /**
- * This responder responds to eth_getBlockByHash with a previously mined (AbstractServer.prototype.mine) block or null if no such block exists.
+ * This responder responds to vap_getBlockByHash with a previously mined (AbstractServer.prototype.mine) block or null if no such block exists.
  * 
  * @param {object} request - JSON-RPC request
  */
-function ethGetBlockByHashResponder(request) {
-  if (request.method !== "eth_getBlockByHash") return undefined;
-  if (!request.params || !request.params[0]) return new Error("eth_getBlockByHash requires a block hash as the first parameter");
+function vapGetBlockByHashResponder(request) {
+  if (request.method !== "vap_getBlockByHash") return undefined;
+  if (!request.params || !request.params[0]) return new Error("vap_getBlockByHash requires a block hash as the first parameter");
   var blockHash = request.params[0];
   for (var i = 0; i < this.blocks.length; ++i) {
     var block = this.blocks[i];
@@ -195,28 +195,28 @@ function ethGetBlockByHashResponder(request) {
 }
 
 /**
- * Responds to eth_blockNumber requests with the number of the most recently mined block.
+ * Responds to vap_blockNumber requests with the number of the most recently mined block.
  * 
  * @param {object} request - JSON-RPC request
  */
-function ethBlockNumberResponder(request) {
-  if (request.method !== "eth_blockNumber") return undefined;
+function vapBlockNumberResponder(request) {
+  if (request.method !== "vap_blockNumber") return undefined;
   return this.blocks[this.blocks.length - 1].number;
 }
 
 /**
- * Responds to eth_sendTransaction requests with the next available fake hash.  Remembers the transaction so the next call to `AbstractServer.mine` will include it in the mined block.
+ * Responds to vap_sendTransaction requests with the next available fake hash.  Remembers the transaction so the next call to `AbstractServer.mine` will include it in the mined block.
  * 
  * @param {object} request - JSON-RPC request
  */
-function ethSendTransactionResponder(request) {
-  if (request.method !== "eth_sendTransaction") return undefined;
-  if (request.params === undefined) throw new Error("Stub server received a JSON-RPC 'eth_sendTransaction' request without a 'params' property.");
-  if (request.params.length !== 1) throw new Error("Stub server received a JSON-RPC 'eth_sendTransaction' request with more or less than 1 parameter.  Actual: " + request.params.length);
+function vapSendTransactionResponder(request) {
+  if (request.method !== "vap_sendTransaction") return undefined;
+  if (request.params === undefined) throw new Error("Stub server received a JSON-RPC 'vap_sendTransaction' request without a 'params' property.");
+  if (request.params.length !== 1) throw new Error("Stub server received a JSON-RPC 'vap_sendTransaction' request with more or less than 1 parameter.  Actual: " + request.params.length);
   let from = request.params[0].from;
-  if (from === undefined) throw new Error("Stub server received a JSON-RPC 'eth_sendTransaction' request without a 'from' property on the provided transaction.");
-  if (typeof from !== "string") throw new Error("Stub server received a JSON-RPC 'eth_sendTransaction' request whose 'from' property on the provided transaction was not a string.  Actual: " + from);
-  if (!/^0x[0-9a-zA-Z]{40}$/.test(from)) throw new Error("Stub server received a JSON-RPC 'eth_sendTransaction' request whose 'from' property on the provided transaction was not an address.");
+  if (from === undefined) throw new Error("Stub server received a JSON-RPC 'vap_sendTransaction' request without a 'from' property on the provided transaction.");
+  if (typeof from !== "string") throw new Error("Stub server received a JSON-RPC 'vap_sendTransaction' request whose 'from' property on the provided transaction was not a string.  Actual: " + from);
+  if (!/^0x[0-9a-zA-Z]{40}$/.test(from)) throw new Error("Stub server received a JSON-RPC 'vap_sendTransaction' request whose 'from' property on the provided transaction was not an address.");
 
   var transaction = request.params[0];
   var transactionHash = "0xbadf00dbadf00dbadf00dbadf00dbadf00dbadf00dbadf00dbadf00dbadf" + ("0000" + (Object.keys(this.transactions).length + 1).toString(16)).slice(-4);
@@ -228,31 +228,31 @@ function ethSendTransactionResponder(request) {
 }
 
 /**
- * Responds to eth_getTransactionByHash with a previously sent transaction or null if no such transaction was found.  The transaction will include details of the block it was mined in if it has been mined.
+ * Responds to vap_getTransactionByHash with a previously sent transaction or null if no such transaction was found.  The transaction will include details of the block it was mined in if it has been mined.
  * 
  * @param {object} request - JSON-RPC request
  */
-function ethGetTransactionByHashResponder(request) {
-  if (request.method !== "eth_getTransactionByHash") return undefined;
+function vapGetTransactionByHashResponder(request) {
+  if (request.method !== "vap_getTransactionByHash") return undefined;
   var transaction = this.transactions[request.params[0]];
   if (transaction == undefined) return null;
   return transaction;
 }
 
 /**
- * Responds to eth_callResponder with the null response.
+ * Responds to vap_callResponder with the null response.
  * 
  * @param {object} request - JSON-RPC request
  */
-function ethCallResponder(request) {
-  if (request.method === "eth_call") return "0x";
+function vapCallResponder(request) {
+  if (request.method === "vap_call") return "0x";
 }
 
 /**
- * This responder responds to `eth_getLogs` method calls with an empty array
+ * This responder responds to `vap_getLogs` method calls with an empty array
  */
-function ethGetLogsResponder(request) {
-  if (request.method !== "eth_getLogs") return undefined;
+function vapGetLogsResponder(request) {
+  if (request.method !== "vap_getLogs") return undefined;
   return [];
 }
 

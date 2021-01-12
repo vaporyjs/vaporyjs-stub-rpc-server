@@ -1,7 +1,8 @@
 {
-  "name": "ethereumjs-stub-rpc-server",
+  "name": "vaporyjs-stub-rpc-server",
+  "namespace": "vaporyjs",
   "version": "2.1.6",
-  "description": "Stub server for testing JavaScript ethereum clients.",
+  "description": "Stub server for testing JavaScript vapory clients.",
   "author": "",
   "main": "./source/index.js",
   "types": "./source/index.d.ts",
@@ -10,13 +11,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ethereumjs/ethereumjs-stub-rpc-server.git"
+    "url": "git+https://github.com/vaporyjs/vaporyjs-stub-rpc-server.git"
   },
   "license": "CC0-1.0",
   "bugs": {
-    "url": "https://github.com/ethereumjs/ethereumjs-stub-rpc-server/issues"
+    "url": "https://github.com/vaporyjs/vaporyjs-stub-rpc-server/issues"
   },
-  "homepage": "https://github.com/ethereumjs/ethereumjs-stub-rpc-server#readme",
+  "homepage": "https://github.com/vaporyjs/vaporyjs-stub-rpc-server#readme",
   "dependencies": {
     "oboe": "2.1.3",
     "ws": "2.2.0"
